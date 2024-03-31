@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: MIT 
 pragma solidity >=0.4.22 <0.9.0;
+import 'openzeppelin-solidity/contracts/math/SafeMath.sol';// 引入openzeppelin-solidity安全计算
 
 // 目的：存储信息和实现行为
 contract Token {
+    // 使用SafeMath进行计算
+    using SafeMath for uint;
+
     //public 关键字solidity会通过public关键字生成一个与之一样的函数
     string public name = 'DApp mi';
     string public symbol = 'DApp';
@@ -19,6 +23,14 @@ contract Token {
         totalSupply = 1000000 * (10 ** decimals);
         // 余额的发送，sender就是部署智能合约的人
         balanceOf[msg.sender] = totalSupply;
+    }
 
+    // 转移函数
+    function transfer (address _to, uint256 _value) public returns(bool sucess) {
+        // 转移者的余额 = 余额 - _value
+        // 接受者的余额 = 余额 + _value
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);
+        balanceOf[_to] = balanceOf[_to].add(_value);
+        return true;
     }
 }

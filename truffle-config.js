@@ -21,7 +21,7 @@ module.exports = {
   compilers: {
     // 将.sol的源码文件编译成以太坊虚拟机上可以执行的字节码
     solc: {
-      version: "0.5.1",      // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.6.1",      // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
        optimizer: {
