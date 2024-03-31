@@ -5,7 +5,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Token',(accounts)=>{
+contract('Token',([deployer,sender,receiver])=>{
     // 声明相关的使用的变量
     let token;
     const name = 'DApp mi' ;// 代码注意规范化
@@ -18,7 +18,7 @@ contract('Token',(accounts)=>{
         // 获取代币
         token = await Token.new()
     })
-    describe('deployment',async ()=>{
+    describe('deployment', ()=>{
         it('tracks the name',async ()=>{
             const result = await token.name()
             result.should.equal(name);
@@ -37,6 +37,12 @@ contract('Token',(accounts)=>{
 
         it('tracks the total supply',async ()=>{
             const result = await token.totalSupply()
+            result.toString().should.equal(totalSupply)
+        })
+
+        // 验证代币是否发送给了部署智能合约的人
+        it('assigns the total supply to the deployer',async ()=>{
+            const result = await token.balanceOf(deployer)
             result.toString().should.equal(totalSupply)
         })
 
