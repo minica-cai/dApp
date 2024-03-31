@@ -6,7 +6,7 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
-contract('Token',([deployer,sender,receiver])=>{
+contract('Token',([deployer,receiver])=>{
     // 声明相关的使用的变量
     let token;
     const name = 'DApp mi' ;// 代码注意规范化
@@ -51,21 +51,33 @@ contract('Token',([deployer,sender,receiver])=>{
 
     // 发送代币的单元测试
     describe('sending tokens',()=>{
+        let result;
+        let amount;
+        beforeEach(async ()=>{
+            amount = tokens(100)
+            // 等待执行转移函数
+            result = await token.transfer(receiver,amount,{from : deployer})
+        })
 
         // 发送代币需要注意验证的点，转移前分别的余额，执行转移，转移后分别的余额
         it('transfer token balances',async ()=>{
             let balanceOf;
-            balanceOf = await token.balanceOf(deployer)
-            balanceOf = await token.balanceOf(receiver)
-            // 等待执行转移函数
-            await token.transfer(receiver,tokens(100),{from : deployer})
-
             // 转移之后
             balanceOf = await token.balanceOf(deployer)
             balanceOf.toString().should.equal(tokens(999900).toString()) // 发送着的余额
             balanceOf = await token.balanceOf(receiver) // 接受者的余额
             balanceOf.toString().should.equal(tokens(100).toString())
 
+        })
+
+        // 触发转移事件的单元测试
+        it('emits a transfer event',async ()=>{
+            const log = result.logs[0]
+            log.event.toString().should.eq('Transfer')
+            const event = log.args
+            event.from.toString().should.equal(deployer,'from is correct')
+            event.to.toString().should.equal(receiver,'to is correct')
+            event.value.toString().should.equal(amount.toString(),'value is correct')
         })
     })
 })
