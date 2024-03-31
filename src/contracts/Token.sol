@@ -33,6 +33,10 @@ contract Token {
 
     // 转移函数
     function transfer (address _to, uint256 _value) public returns(bool sucess) {
+        // solidity 中require(true)向下执行代码，require(false)停止执行
+        require(_to != address(0));
+        require(balanceOf[msg.sender] >= _value); // 判断是否有足够的余额进行转移
+        
         // 转移者的余额 = 余额 - _value
         // 接受者的余额 = 余额 + _value
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(_value);

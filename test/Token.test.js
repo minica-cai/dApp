@@ -1,4 +1,5 @@
-import { tokens } from '../src/utils/help';
+import { should } from 'chai';
+import { tokens,EVM_REVERT } from '../src/utils/help';
 const Token = artifacts.require('./Token')
 
 // 引入chai
@@ -53,31 +54,56 @@ contract('Token',([deployer,receiver])=>{
     describe('sending tokens',()=>{
         let result;
         let amount;
-        beforeEach(async ()=>{
-            amount = tokens(100)
-            // 等待执行转移函数
-            result = await token.transfer(receiver,amount,{from : deployer})
-        })
 
-        // 发送代币需要注意验证的点，转移前分别的余额，执行转移，转移后分别的余额
-        it('transfer token balances',async ()=>{
-            let balanceOf;
-            // 转移之后
-            balanceOf = await token.balanceOf(deployer)
-            balanceOf.toString().should.equal(tokens(999900).toString()) // 发送着的余额
-            balanceOf = await token.balanceOf(receiver) // 接受者的余额
-            balanceOf.toString().should.equal(tokens(100).toString())
+        // 转移成功的单元测试
+        describe('sucess', async () => {
+            beforeEach(async ()=>{
+                amount = tokens(100)
+                // 等待执行转移函数
+                result = await token.transfer(receiver,amount,{from : deployer})
+            })
+    
+            // 发送代币需要注意验证的点，转移前分别的余额，执行转移，转移后分别的余额
+            it('transfer token balances',async ()=>{
+                let balanceOf;
+                // 转移之后
+                balanceOf = await token.balanceOf(deployer)
+                balanceOf.toString().should.equal(tokens(999900).toString()) // 发送着的余额
+                balanceOf = await token.balanceOf(receiver) // 接受者的余额
+                balanceOf.toString().should.equal(tokens(100).toString())
+    
+            })
+    
+            // 触发转移事件的单元测试
+            it('emits a transfer event',async ()=>{
+                const log = result.logs[0]
+                log.event.toString().should.eq('Transfer')
+                const event = log.args
+                event.from.toString().should.equal(deployer,'from is correct')
+                event.to.toString().should.equal(receiver,'to is correct')
+                event.value.toString().should.equal(amount.toString(),'value is correct')
+            })            
+        });
 
-        })
+        // 转移失败的单元测试
+        describe('failure',async ()=>{
+            // 当余额不足
+            it('rejects insufficient balances',async ()=> {
+                let invalidAmount;
+                //当转移的数量 > 代币总量的时候 --- 结果是要被拒绝
+                invalidAmount = tokens(10000000)
+                await token.transfer(receiver,invalidAmount,{from : deployer}).should.be.rejectedWith(EVM_REVERT)
 
-        // 触发转移事件的单元测试
-        it('emits a transfer event',async ()=>{
-            const log = result.logs[0]
-            log.event.toString().should.eq('Transfer')
-            const event = log.args
-            event.from.toString().should.equal(deployer,'from is correct')
-            event.to.toString().should.equal(receiver,'to is correct')
-            event.value.toString().should.equal(amount.toString(),'value is correct')
+                // 如果接收者没有任何代币也是需要被拒绝的
+                invalidAmount = tokens(10)
+                await token.transfer(deployer,invalidAmount,{from : receiver}).should.be.rejectedWith(EVM_REVERT)
+
+            })
+            // 当地址错误
+            it('rejects invalid recipients',async ()=>{
+                //  认为最后一个地址是0x0
+                await token.transfer(0x0, amount, {from : deployer}).should.be.rejected;
+            })
         })
     })
 })
