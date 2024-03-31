@@ -16,3 +16,9 @@
 3. 配置基础配置
 4. 编写sol文件，通过命令truffle compile执行编译
 5. 通过命令truffle migrate执行连接测试(如果遇到部署失败，方式修正solidity的版本和solc的配置版本为兼容版本)
+6. truffle console 打开truffle的控制台输入(数据的获取都是异步的，所以需要等待数据的回来)
+
+##### 单元测试
+1. mocha(https://mochajs.org/)
+2. chai(https://www.chaijs.com/)
+3. 编写单元测试用例，并进行用例测试truffle test(注意所有的数据获取都是异步函数，所以需要await等待结果)
