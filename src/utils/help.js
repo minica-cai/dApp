@@ -14,11 +14,16 @@
  */
 
 // 格式化
-export const tokens = (n) => {
+export const ether = (n) => {
     return new web3.utils.BN(
         web3.utils.toWei(n.toString(),'ether')
     )
 }
 
+export const tokens = (n) => ether(n)
+
 // 错误提示的文案
 export const EVM_REVERT = 'VM Exception while processing transaction: revert'
+
+// Ether地址
+export const ETHER_ADDRESS = '0x0000000000000000000000000000000000000000'
