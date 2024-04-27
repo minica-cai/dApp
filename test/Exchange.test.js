@@ -41,6 +41,7 @@ contract('Exchange',([deployer,feeAccount,user1])=>{
         });
     });
 
+    // 存入ether
     describe('depositing Ether', () => {
         let result;
         let amount;
@@ -66,6 +67,30 @@ contract('Exchange',([deployer,feeAccount,user1])=>{
             event.balance.toString().should.equal(amount.toString(),'balance is correct')
         }) 
         
+    });
+
+    // 取ether
+    describe('withdrawing Ether', () => {
+        let result;
+        let amount;
+        beforeEach(async () =>{
+            amount =  ether(1)
+            result = await exchange.depositEther({ from: user1 , value: amount})
+        })
+        describe('success', () => { 
+            beforeEach(async () =>{
+                amount =  ether(1)
+                result = await exchange.withDrawEther(amount, { from: user1 })
+            })
+            it('withdraws Ether founds', async () => {
+                let balance;
+                balance = await exchange.tokens(ETHER_ADDRESS,user1)
+                balance.toString().should.equal('0')
+            });
+         })
+        describe('failure', () => { 
+
+         })
     });
 
     describe('depositing tokens',()=>{

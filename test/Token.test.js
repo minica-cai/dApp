@@ -24,7 +24,6 @@ contract('Token',([deployer,receiver,exchange])=>{
         it('tracks the name',async ()=>{
             const result = await token.name()
             result.should.equal(name);
-            // read token name
         })
 
         it('tracks the symbol',async ()=>{

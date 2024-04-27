@@ -25,10 +25,15 @@ contract Exchange {
     // 存款事件，token代币 ， user地址 ，amount数量，balance余额
     event Deposit(address token,address user,uint256 amount,uint256 balance);
 
-    // payable 能够接受元数据（Ether）的函数
+    // payable 能够接受元数据（Ether）的函数 Ether只能单独存放
     function depositEther() payable public {
         tokens[Ether][msg.sender] = tokens[Ether][msg.sender].add(msg.value);
         emit Deposit(Ether,msg.sender,msg.value,tokens[Ether][msg.sender]);
+    }
+
+    // 提取 Ether单独提取
+    function withDrawEther(uint256 _amount) public {
+        tokens[Ether][msg.sender] = tokens[Ether][msg.sender].sub(_amount);
     }
 
     function depositToken(address _token,uint256 _amount) public {
